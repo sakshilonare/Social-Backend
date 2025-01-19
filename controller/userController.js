@@ -1,9 +1,7 @@
-const multer = require("multer");
-const path = require("path");
-const User = require("../models/userModel");
 const cloudinary = require("cloudinary").v2;
-const fs = require("fs");
+const User = require("../models/userModel");
 const dotenv = require("dotenv");
+
 dotenv.config();
 
 cloudinary.config({
@@ -11,7 +9,6 @@ cloudinary.config({
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
-
 
 const uploadUserData = async (req, res) => {
   try {
@@ -22,7 +19,12 @@ const uploadUserData = async (req, res) => {
     }
 
     const uploadPromises = req.files.map((file) =>
-      cloudinary.uploader.upload(file.path, { folder: "user_uploads" })
+      cloudinary.uploader.upload_stream({ folder: "user_uploads" }, (error, result) => {
+        if (error) {
+          throw new Error(error.message);
+        }
+        return result;
+      }).end(file.buffer)
     );
 
     const uploadResults = await Promise.all(uploadPromises);
@@ -32,8 +34,6 @@ const uploadUserData = async (req, res) => {
     const newUser = new User({ name, email, images: imageUrls });
     await newUser.save();
 
-    req.files.forEach((file) => fs.unlinkSync(file.path));
-
     res.status(201).json({ message: "User data and images uploaded successfully!" });
   } catch (err) {
     console.error(err);
@@ -41,7 +41,6 @@ const uploadUserData = async (req, res) => {
   }
 };
 
-// Fetch All Users with their images
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
