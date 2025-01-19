@@ -18,10 +18,15 @@ const uploadUserData = async (req, res) => {
     }
 
     const uploadPromises = req.files.map((file) =>
-      cloudinary.uploader.upload(
-        file.buffer, 
-        { folder: "user_uploads" } 
-      )
+      cloudinary.uploader.upload_stream(
+        { folder: "user_uploads" }, 
+        (error, result) => {
+          if (error) {
+            throw error;
+          }
+          return result.secure_url;
+        }
+      ).end(file.buffer) 
     );
 
     const uploadResults = await Promise.all(uploadPromises);
