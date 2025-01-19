@@ -22,7 +22,7 @@ const uploadUserData = async (req, res) => {
       new Promise((resolve, reject) => {
         const byteArrayBuffer = file.buffer; // Get buffer from Multer
 
-        cloudinary.v2.uploader.upload_stream(
+        cloudinary.uploader.upload_stream(
           { folder: "user_uploads" }, // Specify folder on Cloudinary
           (error, result) => {
             if (error) {
