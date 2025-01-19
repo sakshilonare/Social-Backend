@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 const corsOptions = {
-    origin: 'https://social-3w.netlify.app/',
+    origin: 'https://social-3w.netlify.app',
     methods: 'GET, POST, PUT, DELETE, PATCH, HEAD',
     credentials: true,
 };
