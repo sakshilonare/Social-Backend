@@ -12,10 +12,4 @@
       "dest": "server.js"
     }
   ],
-  "env": {
-    "MONGODB_URL": "@mongodb_url", 
-    "CLOUDINARY_CLOUD_NAME": "@cloud_name", 
-    "CLOUDINARY_API_KEY": "@api_key",
-    "CLOUDINARY_API_SECRET": "@api_secret"
-  }
 }
