@@ -10,16 +10,14 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// const corsOptions = {
-//     Access-Control-Allow-Origin : 'https://social-3w.netlify.app',
-//     methods: 'GET, POST, PUT, DELETE, PATCH, HEAD',
-//     credentials: true,
-// };
-// app.use(cors(corsOptions));
+const corsOptions = {
+    origin: ["http://localhost:3000", "https://social-3w.netlify.app"], 
+    methods: "GET, POST, PUT, DELETE",
+    credentials: true,
+    allowedHeaders: "Content-Type, Authorization", 
+};
 
-app.use(cors({
-    origin: ["http://localhost:3000","https://social-3w.netlify.app"]
-}));
+app.use(cors(corsOptions)); // Use the CORS middleware with these options
 app.use(express.json());
 app.use(express.static("public"));
 app.use(bodyParser.json());
