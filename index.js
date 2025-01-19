@@ -37,10 +37,16 @@ db.once('open', () => {
 const cloudinary = require('./config/cloudinary');
 cloudinary.cloudinaryConnect();
 
+app.get("/", (req, res) => {
+    res.status(200).json({
+        message: "Welcome to the Social API."
+    });
+});
+
 // Routes
 app.use("/api/user", userRoutes); 
 app.use("/uploads", express.static("uploads"));
 
-app.listen(PORT, () => {
+app.listen(PORT, (./) => {
     console.log(`Server is running on port ${PORT}`);
 });
