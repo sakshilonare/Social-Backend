@@ -1,7 +1,9 @@
-const cloudinary = require("cloudinary").v2;
+const multer = require("multer");
+const path = require("path");
 const User = require("../models/userModel");
+const cloudinary = require("cloudinary").v2;
+const fs = require("fs");
 const dotenv = require("dotenv");
-
 dotenv.config();
 
 cloudinary.config({
@@ -9,6 +11,7 @@ cloudinary.config({
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
+
 
 const uploadUserData = async (req, res) => {
   try {
@@ -18,21 +21,18 @@ const uploadUserData = async (req, res) => {
       return res.status(400).json({ error: "Name, email, and images are required!" });
     }
 
-    // Using Promise.all to upload each file asynchronously
-    const uploadPromises = req.files.map((file) => {
-      return cloudinary.uploader.upload(file.path, { folder: "user_uploads" })
-        .then((result) => result.secure_url)  
-        .catch((error) => {
-          throw new Error(error.message); 
-        });
-    });
+    const uploadPromises = req.files.map((file) =>
+      cloudinary.uploader.upload(file.path, { folder: "user_uploads" })
+    );
 
-    // Wait for all uploads to complete
-    const imageUrls = await Promise.all(uploadPromises);
+    const uploadResults = await Promise.all(uploadPromises);
 
-    // Create a new user with the uploaded image URLs
+    const imageUrls = uploadResults.map((result) => result.secure_url);
+
     const newUser = new User({ name, email, images: imageUrls });
     await newUser.save();
+
+    req.files.forEach((file) => fs.unlinkSync(file.path));
 
     res.status(201).json({ message: "User data and images uploaded successfully!" });
   } catch (err) {
@@ -41,6 +41,7 @@ const uploadUserData = async (req, res) => {
   }
 };
 
+// Fetch All Users with their images
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
