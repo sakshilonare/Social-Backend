@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const cloudinary = require("cloudinary").v2;
 const dotenv = require("dotenv");
+const fs = require("fs");
 dotenv.config();
 
 cloudinary.config({
@@ -18,15 +19,19 @@ const uploadUserData = async (req, res) => {
     }
 
     const uploadPromises = req.files.map((file) =>
-      cloudinary.uploader.upload_stream(
-        { folder: "user_uploads" }, 
-        (error, result) => {
-          if (error) {
-            throw error;
+      new Promise((resolve, reject) => {
+        const byteArrayBuffer = file.buffer; // Get buffer from Multer
+
+        cloudinary.v2.uploader.upload_stream(
+          { folder: "user_uploads" }, // Specify folder on Cloudinary
+          (error, result) => {
+            if (error) {
+              reject(error);
+            }
+            resolve(result);
           }
-          return result.secure_url;
-        }
-      ).end(file.buffer) 
+        ).end(byteArrayBuffer); 
+      })
     );
 
     const uploadResults = await Promise.all(uploadPromises);
