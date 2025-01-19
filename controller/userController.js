@@ -18,19 +18,19 @@ const uploadUserData = async (req, res) => {
       return res.status(400).json({ error: "Name, email, and images are required!" });
     }
 
-    const uploadPromises = req.files.map((file) =>
-      cloudinary.uploader.upload_stream({ folder: "user_uploads" }, (error, result) => {
-        if (error) {
-          throw new Error(error.message);
-        }
-        return result;
-      }).end(file.buffer)
-    );
+    // Using Promise.all to upload each file asynchronously
+    const uploadPromises = req.files.map((file) => {
+      return cloudinary.uploader.upload(file.path, { folder: "user_uploads" })
+        .then((result) => result.secure_url)  
+        .catch((error) => {
+          throw new Error(error.message); 
+        });
+    });
 
-    const uploadResults = await Promise.all(uploadPromises);
+    // Wait for all uploads to complete
+    const imageUrls = await Promise.all(uploadPromises);
 
-    const imageUrls = uploadResults.map((result) => result.secure_url);
-
+    // Create a new user with the uploaded image URLs
     const newUser = new User({ name, email, images: imageUrls });
     await newUser.save();
 
