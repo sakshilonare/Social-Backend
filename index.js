@@ -10,12 +10,16 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const corsOptions = {
-    origin: 'https://social-3w.netlify.app',
-    methods: 'GET, POST, PUT, DELETE, PATCH, HEAD',
-    credentials: true,
-};
-app.use(cors(corsOptions));
+// const corsOptions = {
+//     Access-Control-Allow-Origin : 'https://social-3w.netlify.app',
+//     methods: 'GET, POST, PUT, DELETE, PATCH, HEAD',
+//     credentials: true,
+// };
+// app.use(cors(corsOptions));
+
+app.use(cors({
+  origin: '*',
+}));
 
 app.use(bodyParser.json());
 
